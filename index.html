@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshMart — Smart Inventory Dashboard</title>
+    <link rel="stylesheet" href="freshmart.css">
+</head>
+
+<body>
+    <!-- Floating Leaf Particles -->
+    <div class="leaf-particles" id="leaf-particles"></div>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="images/logo.png" alt="FreshMart">
+            <h2>Fresh<span>Pulse</span> DSS</h2>
+        </div>
+        <div class="topbar-right">
+            <div class="mode-tabs">
+                <button class="mode-tab active" onclick="setMode('full')">Full Auto</button>
+                <button class="mode-tab" onclick="setMode('semi')">Semi Auto</button>
+                <button class="mode-tab" onclick="setMode('manual')">Manual</button>
+            </div>
+            <div class="security-badge" style="margin:0;padding:6px 12px;font-size:0.7rem;">🔒 Secure</div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard active" id="dashboard">
+
+        <!-- Hero -->
+        <div class="hero-section">
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <h1>Smart <span>Inventory</span> Manager</h1>
+                <p>AI reduces stockouts by 85% and cuts waste by 60%. No training needed — just approve or adjust.</p>
+            </div>
+        </div>
+
+        <!-- Fresh Produce Banner -->
+        <div style="padding:0 24px 8px;" class="reveal">
+            <img src="images/fresh_produce.png" alt="Fresh Produce" class="produce-banner">
+        </div>
+
+        <!-- KPI Row -->
+        <div class="dash-grid reveal" id="kpis">
+            <div class="kpi-card-3d">
+                <div class="kpi-card green">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-label">Savings This Month</div>
+                    <div class="kpi-value" id="kpi-savings">$0</div>
+                    <span class="kpi-change up">↑ Less waste</span>
+                </div>
+            </div>
+            <div class="kpi-card-3d">
+                <div class="kpi-card blue">
+                    <div class="kpi-icon">📦</div>
+                    <div class="kpi-label">Stock Health</div>
+                    <div class="kpi-value" id="kpi-stock">0%</div>
+                    <span class="kpi-change up">↑ Optimal</span>
+                </div>
+            </div>
+            <div class="kpi-card-3d">
+                <div class="kpi-card red">
+                    <div class="kpi-icon">⚠️</div>
+                    <div class="kpi-label">Stockout Risk</div>
+                    <div class="kpi-value" id="kpi-risk">0</div>
+                    <span class="kpi-change down">Items at risk</span>
+                </div>
+            </div>
+            <div class="kpi-card-3d">
+                <div class="kpi-card orange">
+                    <div class="kpi-icon">🗑️</div>
+                    <div class="kpi-label">Waste Rate</div>
+                    <div class="kpi-value" id="kpi-waste">0%</div>
+                    <span class="kpi-change up">↓ Improving</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Orders (Core Feature) -->
+        <div class="section-divider reveal">
+            <h2>🧠 AI Smart Orders</h2>
+            <p>Review and approve — AI explains every suggestion</p>
+        </div>
+        <div style="padding:0 24px 24px" class="reveal">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📋 Today's Auto-Order Suggestions</h3>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-approve" onclick="approveAll()" style="font-size:0.8rem;padding:8px 16px;">✅
+                            Approve All</button>
+                    </div>
+                </div>
+                <div class="panel-body" id="orders-list"></div>
+            </div>
+        </div>
+
+        <!-- Inventory + Waste Side by Side -->
+        <div class="dash-grid cols-2 reveal" style="padding:0 24px 24px">
+            <!-- Inventory -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📦 Stock Levels</h3>
+                </div>
+                <div class="panel-body" style="padding:0;overflow-x:auto;">
+                    <table class="inv-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Stock</th>
+                                <th>Order Date</th>
+                                <th>Expiry Date</th>
+                                <th>Days Left</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inv-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Waste Chart -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>🗑️ Weekly Waste Trend</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="chart-bars" id="waste-chart"></div>
+                    <div class="savings-counter" style="padding:16px 0 0;">
+                        <div class="savings-value" id="total-saved">$0</div>
+                        <div class="savings-label">Total saved vs. last month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Upload Section -->
+        <div class="section-divider reveal">
+            <h2>📤 Upload Stock List</h2>
+            <p>Upload a CSV file to update your inventory — or download the template to get started</p>
+        </div>
+        <div style="padding:0 24px 24px" class="reveal">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📁 CSV Stock Manager</h3>
+                    <div style="display:flex;gap:12px;">
+                        <a href="sample_stock_list.csv" download="freshmart_stock_template.csv" class="btn-approve"
+                            style="flex:0;padding:10px 20px;background:var(--fm-green);color:#0a1628;font-size:0.85rem;display:flex;align-items:center;gap:8px;text-decoration:none;">⬇
+                            Download Template</a>
+                        <a href="javascript:void(0)" onclick="exportCurrentStock()" class="btn-approve"
+                            style="flex:0;padding:10px 20px;background:var(--fm-blue);color:#0a1628;font-size:0.85rem;display:flex;align-items:center;gap:8px;text-decoration:none;">📊
+                            Export Current</a>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <!-- Upload Zone -->
+                    <div id="upload-zone"
+                        style="border:2px dashed var(--fm-border);border-radius:var(--fm-radius);padding:40px;text-align:center;transition:all var(--fm-transition);cursor:pointer;"
+                        onclick="document.getElementById('csv-file').click()"
+                        ondragover="event.preventDefault();this.style.borderColor='var(--fm-green)';this.style.background='var(--fm-green-dim)'"
+                        ondragleave="this.style.borderColor='var(--fm-border)';this.style.background='transparent'"
+                        ondrop="event.preventDefault();this.style.borderColor='var(--fm-border)';this.style.background='transparent';handleCSVFile(event.dataTransfer.files[0])">
+                        <div style="font-size:2.5rem;margin-bottom:12px;">📄</div>
+                        <div style="font-weight:700;font-size:1rem;margin-bottom:4px;">Drop CSV file here or click to
+                            browse</div>
+                        <div style="color:var(--fm-text-dim);font-size:0.85rem;">Supports: .csv files with headers
+                            (Product Name, Category, Quantity, etc.)</div>
+                        <input type="file" id="csv-file" accept=".csv" style="display:none"
+                            onchange="handleCSVFile(this.files[0])">
+                    </div>
+                    <!-- Upload Results -->
+                    <div id="upload-result" style="margin-top:16px;"></div>
+                    <!-- Preview Table -->
+                    <div id="upload-preview" style="margin-top:16px;overflow-x:auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Log -->
+        <div style="padding:0 24px 24px" class="reveal">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📋 Audit Trail</h3><span style="font-size:0.75rem;color:var(--fm-text-dim)">All actions
+                        logged</span>
+                </div>
+                <div class="panel-body" id="audit-log"></div>
+            </div>
+        </div>
+
+        <!-- Client Adjustable Settings -->
+        <div class="section-divider reveal">
+            <h2>⚙️ Client Settings</h2>
+            <p>Managers can adjust these settings to fit their store</p>
+        </div>
+        <div style="padding:0 24px 24px" class="reveal">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>🎛️ Adjustable Parameters</h3>
+                </div>
+                <div class="panel-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div class="order-card">
+                            <div class="order-top"><span class="order-product">📊 Budget Limits</span></div>
+                            <div style="margin-top:8px;">
+                                <label
+                                    style="display:block;font-size:0.8rem;color:var(--fm-text-dim);margin-bottom:4px;">Daily
+                                    Order Budget ($)</label>
+                                <input type="number" id="cfg-budget" value="500"
+                                    style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--fm-border);border-radius:8px;color:var(--fm-text);font-family:var(--fm-font);outline:none;"
+                                    onchange="updateSetting('budget',this.value)">
+                            </div>
+                        </div>
+                        <div class="order-card">
+                            <div class="order-top"><span class="order-product">⚠️ Expiry Alert Days</span></div>
+                            <div style="margin-top:8px;">
+                                <label
+                                    style="display:block;font-size:0.8rem;color:var(--fm-text-dim);margin-bottom:4px;">Warn
+                                    when expiry is within (days)</label>
+                                <input type="number" id="cfg-expiry" value="3" min="1" max="14"
+                                    style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--fm-border);border-radius:8px;color:var(--fm-text);font-family:var(--fm-font);outline:none;"
+                                    onchange="updateSetting('expiry',this.value)">
+                            </div>
+                        </div>
+                        <div class="order-card">
+                            <div class="order-top"><span class="order-product">📦 Restock Threshold</span></div>
+                            <div style="margin-top:8px;">
+                                <label
+                                    style="display:block;font-size:0.8rem;color:var(--fm-text-dim);margin-bottom:4px;">Auto-order
+                                    when stock falls below (%)</label>
+                                <input type="range" id="cfg-restock" value="30" min="10" max="70"
+                                    style="width:100%;accent-color:var(--fm-green);"
+                                    oninput="document.getElementById('restock-val').textContent=this.value+'%';updateSetting('restock',this.value)">
+                                <span id="restock-val"
+                                    style="font-size:0.85rem;color:var(--fm-green);font-weight:700;">30%</span>
+                            </div>
+                        </div>
+                        <div class="order-card">
+                            <div class="order-top"><span class="order-product">🤖 AI Order Mode</span></div>
+                            <div style="margin-top:8px;">
+                                <label
+                                    style="display:block;font-size:0.8rem;color:var(--fm-text-dim);margin-bottom:4px;">Default
+                                    ordering behavior</label>
+                                <select id="cfg-mode"
+                                    style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--fm-border);border-radius:8px;color:var(--fm-text);font-family:var(--fm-font);outline:none;"
+                                    onchange="updateSetting('mode',this.value)">
+                                    <option value="full">Full Auto — Within budget limits</option>
+                                    <option value="semi" selected>Semi Auto — Suggest + Approve</option>
+                                    <option value="manual">Manual — Manager controls all</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="order-card">
+                            <div class="order-top"><span class="order-product">🏪 Supplier Preferences</span></div>
+                            <div style="margin-top:8px;">
+                                <label
+                                    style="display:block;font-size:0.8rem;color:var(--fm-text-dim);margin-bottom:4px;">Preferred
+                                    suppliers (comma separated)</label>
+                                <input type="text" id="cfg-suppliers" value="DairyFresh Co., Golden Bakery, TropicFarms"
+                                    style="width:100%;padding:10px;background:rgba(0,0,0,0.3);border:1px solid var(--fm-border);border-radius:8px;color:var(--fm-text);font-family:var(--fm-font);outline:none;font-size:0.85rem;"
+                                    onchange="updateSetting('suppliers',this.value)">
+                            </div>
+                        </div>
+                        <div class="order-card">
+                            <div class="order-top"><span class="order-product">📅 Delivery Schedule</span></div>
+                            <div style="margin-top:8px;">
+                                <label
+                                    style="display:block;font-size:0.8rem;color:var(--fm-text-dim);margin-bottom:4px;">Delivery
+                                    days</label>
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" checked style="accent-color:var(--fm-green);">Mon</label>
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" style="accent-color:var(--fm-green);">Tue</label>
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" checked style="accent-color:var(--fm-green);">Wed</label>
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" style="accent-color:var(--fm-green);">Thu</label>
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" checked style="accent-color:var(--fm-green);">Fri</label>
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" style="accent-color:var(--fm-green);">Sat</label>
+                                    <label
+                                        style="display:flex;align-items:center;gap:4px;font-size:0.8rem;cursor:pointer;"><input
+                                            type="checkbox" style="accent-color:var(--fm-green);">Sun</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;text-align:right;">
+                        <button class="btn-approve" onclick="saveSettings()"
+                            style="flex:0;padding:10px 24px;font-size:0.85rem;">💾 Save Settings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align:center;padding:32px;color:var(--fm-text-dim);font-size:0.8rem;">
+            <p>🔒 FreshPulse DSS by <strong>CheehowTech</strong> — Powered by FreshPulse™ AI</p>
+            <p style="margin-top:4px;">Every order is logged, auditable, and secure.</p>
+        </div>
+    </div>
+
+    <script>
+        // ===== DATA (simulated) =====
+        let products = [
+            { name: '🥛 Fresh Milk', stock: 12, max: 100, shelf: 3, unit: 'L', price: 4.50, cat: 'dairy', orderDate: '2026-03-01', expiryDate: '2026-03-04', supplier: 'DairyFresh Co.' },
+            { name: '🍞 White Bread', stock: 8, max: 60, shelf: 2, unit: 'loaves', price: 2.80, cat: 'bakery', orderDate: '2026-03-01', expiryDate: '2026-03-03', supplier: 'Golden Bakery' },
+            { name: '🍌 Bananas', stock: 45, max: 80, shelf: 5, unit: 'kg', price: 3.20, cat: 'fruit', orderDate: '2026-02-28', expiryDate: '2026-03-05', supplier: 'TropicFarms' },
+            { name: '🥚 Eggs (dozen)', stock: 65, max: 120, shelf: 14, unit: 'dozen', price: 5.50, cat: 'dairy', orderDate: '2026-02-27', expiryDate: '2026-03-13', supplier: 'FarmFresh Eggs' },
+            { name: '🍎 Apples', stock: 30, max: 70, shelf: 10, unit: 'kg', price: 4.00, cat: 'fruit', orderDate: '2026-02-28', expiryDate: '2026-03-10', supplier: 'OrchardPick' },
+            { name: '🧀 Cheddar Cheese', stock: 18, max: 50, shelf: 21, unit: 'packs', price: 6.50, cat: 'dairy', orderDate: '2026-02-25', expiryDate: '2026-03-18', supplier: 'CheeseWorld' },
+            { name: '🥬 Lettuce', stock: 5, max: 40, shelf: 3, unit: 'heads', price: 2.50, cat: 'veg', orderDate: '2026-03-01', expiryDate: '2026-03-04', supplier: 'GreenLeaf Farm' },
+            { name: '🍗 Chicken Breast', stock: 10, max: 60, shelf: 2, unit: 'kg', price: 9.00, cat: 'meat', orderDate: '2026-03-01', expiryDate: '2026-03-03', supplier: 'PoultryPlus' },
+            { name: '🥤 Orange Juice', stock: 55, max: 90, shelf: 10, unit: 'bottles', price: 3.50, cat: 'drinks', orderDate: '2026-02-26', expiryDate: '2026-03-08', supplier: 'JuicyCo' },
+            { name: '🧈 Butter', stock: 25, max: 40, shelf: 30, unit: 'packs', price: 4.00, cat: 'dairy', orderDate: '2026-02-20', expiryDate: '2026-03-22', supplier: 'DairyFresh Co.' },
+        ];
+
+        const reasons = {
+            dairy: ['Weekend demand spike expected (+32%)', 'School holiday starts in 2 days', 'Hot weather forecast — dairy sales increase'],
+            bakery: ['Monday restock pattern detected', 'Bread sells out before noon lately', 'Adjacent store reported stockout'],
+            fruit: ['Seasonal demand rising', 'Promotion planned next week', 'Current stock below 3-day buffer'],
+            veg: ['Shelf life only 3 days — must order fresh', 'Salad demand up 22% this month', 'Low stock alert triggered'],
+            meat: ['BBQ weekend forecast (28°C)', 'Current stock covers only 1 day', 'Supplier lead time is 24hrs'],
+            drinks: ['Heat wave expected — +45% demand', 'Stock is healthy — routine refill', 'Expiry dates approaching on current batch'],
+        };
+
+        // ===== RENDER INVENTORY =====
+        function renderInventory() {
+            const tbody = document.getElementById('inv-body');
+            const today = new Date();
+            tbody.innerHTML = products.map(p => {
+                const pct = Math.round(p.stock / p.max * 100);
+                const expiry = new Date(p.expiryDate);
+                const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                const expiryClass = daysLeft <= 1 ? 'danger' : daysLeft <= 3 ? 'warning' : 'safe';
+                const expiryIcon = daysLeft <= 1 ? '🔴' : daysLeft <= 3 ? '🟡' : '🟢';
+                const risk = pct > 50 ? 'safe' : pct > 20 ? 'warning' : 'danger';
+                const riskLabel = pct > 50 ? '✅ OK' : pct > 20 ? '⚠️ Low' : '🚨 Critical';
+                const fmtDate = d => { const dt = new Date(d); return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }); };
+                return `<tr>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.stock} ${p.unit}</td>
+          <td style="font-size:0.8rem;color:var(--fm-text-dim)">${fmtDate(p.orderDate)}</td>
+          <td style="font-size:0.8rem;"><span class="risk-badge ${expiryClass}">${fmtDate(p.expiryDate)}</span></td>
+          <td style="font-weight:700;">${expiryIcon} ${daysLeft}d</td>
+          <td><span class="risk-badge ${risk}">${riskLabel}</span></td>
+        </tr>`;
+            }).join('');
+        }
+
+        // ===== RENDER ORDERS =====
+        function renderOrders() {
+            const list = document.getElementById('orders-list');
+            const needsOrder = products.filter(p => (p.stock / p.max) < 0.5);
+            list.innerHTML = needsOrder.map((p, i) => {
+                const orderQty = Math.round(p.max * 0.7 - p.stock);
+                const cost = (orderQty * p.price).toFixed(2);
+                const confidence = Math.round(80 + Math.random() * 18);
+                const reason = reasons[p.cat][Math.floor(Math.random() * reasons[p.cat].length)];
+                return `<div class="order-card" id="order-${i}">
+          <div class="order-top">
+            <span class="order-product">${p.name}</span>
+            <span class="order-qty">Order: ${orderQty} ${p.unit} ($${cost})</span>
+          </div>
+          <div class="confidence-meter">
+            <div class="confidence-ring">
+              <svg width="48" height="48" viewBox="0 0 48 48">
+                <circle class="ring-bg" cx="24" cy="24" r="20"/>
+                <circle class="ring-fill" cx="24" cy="24" r="20"
+                  stroke="${confidence > 85 ? 'var(--fm-green)' : 'var(--fm-orange)'}"
+                  stroke-dasharray="${2 * Math.PI * 20}"
+                  stroke-dashoffset="${2 * Math.PI * 20 * (1 - confidence / 100)}"/>
+              </svg>
+              <span class="ring-label">${confidence}%</span>
+            </div>
+            <span style="font-size:0.8rem;color:var(--fm-text-dim)">AI Confidence</span>
+          </div>
+          <div class="order-reason">
+            <span class="reason-icon">💡</span>
+            <span><strong>Why this order:</strong> ${reason}</span>
+          </div>
+          <div class="order-actions">
+            <button class="btn-approve" onclick="approveOrder(${i},'${p.name}',${orderQty},'${p.unit}',${cost})">✅ Approve</button>
+            <button class="btn-reject" onclick="rejectOrder(${i})">✕ Skip</button>
+          </div>
+        </div>`;
+            }).join('');
+        }
+
+        // ===== RENDER WASTE CHART =====
+        function renderWasteChart() {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const data = [42, 38, 28, 22, 18, 15, 12];
+            const max = Math.max(...data);
+            const chart = document.getElementById('waste-chart');
+            chart.innerHTML = days.map((d, i) => `
+        <div class="chart-bar-col">
+          <div class="chart-bar-inner" id="wbar-${i}" style="height:0;background:linear-gradient(to top,${data[i] > 30 ? 'var(--fm-red)' : 'var(--fm-green)'},var(--fm-blue))">
+            <span class="bar-val">$${data[i]}</span>
+          </div>
+          <div class="chart-bar-lbl">${d}</div>
+        </div>
+      `).join('');
+            setTimeout(() => {
+                data.forEach((v, i) => {
+                    document.getElementById('wbar-' + i).style.height = (v / max * 180) + 'px';
+                });
+            }, 300);
+        }
+
+        // ===== RENDER AUDIT LOG =====
+        const auditEntries = [
+            { icon: 'auto', emoji: '🤖', text: '<strong>Auto-Order:</strong> 50L Fresh Milk', detail: 'Budget: $225 (under $500 limit) • Supplier: DairyFresh Co.', time: '10:30 AM' },
+            { icon: 'approved', emoji: '✅', text: '<strong>Manager Approved:</strong> 40 loaves White Bread', detail: 'Reason: Weekend stock — Confidence: 94%', time: '10:15 AM' },
+            { icon: 'pending', emoji: '⏳', text: '<strong>Pending:</strong> 30kg Chicken Breast ($270)', detail: 'Above $250 threshold — requires approval', time: '10:05 AM' },
+            { icon: 'auto', emoji: '🔄', text: '<strong>Auto-Restock:</strong> 20 heads Lettuce', detail: 'Shelf life 3 days — routine fresh order', time: '9:45 AM' },
+            { icon: 'approved', emoji: '📊', text: '<strong>System:</strong> Daily waste report generated', detail: 'Waste down 18% vs last week • $340 saved', time: '9:00 AM' },
+        ];
+
+        function renderAuditLog() {
+            const log = document.getElementById('audit-log');
+            log.innerHTML = auditEntries.map(a => `
+        <div class="audit-entry">
+          <div class="audit-icon ${a.icon}">${a.emoji}</div>
+          <div class="audit-text">${a.text}<div class="audit-detail">${a.detail}</div></div>
+          <div class="audit-time">${a.time}</div>
+        </div>
+      `).join('');
+        }
+
+        // ===== ACTIONS =====
+        function approveOrder(i, name, qty, unit, cost) {
+            const card = document.getElementById('order-' + i);
+            card.style.background = 'var(--fm-green-dim)';
+            card.style.borderColor = 'rgba(6,214,160,0.3)';
+            card.querySelector('.order-actions').innerHTML = '<span style="color:var(--fm-green);font-weight:700;">✅ Approved & Ordered</span>';
+            auditEntries.unshift({ icon: 'approved', emoji: '✅', text: `<strong>Approved:</strong> ${qty} ${unit} ${name}`, detail: `Cost: $${cost} • Sent to supplier`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            renderAuditLog();
+        }
+
+        function rejectOrder(i) {
+            const card = document.getElementById('order-' + i);
+            card.style.opacity = '0.4';
+            card.querySelector('.order-actions').innerHTML = '<span style="color:var(--fm-text-dim);font-size:0.85rem;">Skipped by manager</span>';
+            auditEntries.unshift({ icon: 'pending', emoji: '⏭️', text: `<strong>Skipped:</strong> Order #${i + 1}`, detail: 'Manager chose to skip this suggestion', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            renderAuditLog();
+        }
+
+        function approveAll() {
+            document.querySelectorAll('.order-card').forEach((card, i) => {
+                if (!card.querySelector('.btn-approve')) return;
+                setTimeout(() => {
+                    card.style.background = 'var(--fm-green-dim)';
+                    card.style.borderColor = 'rgba(6,214,160,0.3)';
+                    card.querySelector('.order-actions').innerHTML = '<span style="color:var(--fm-green);font-weight:700;">✅ Approved & Ordered</span>';
+                }, i * 200);
+            });
+            auditEntries.unshift({ icon: 'approved', emoji: '🚀', text: '<strong>Bulk Approve:</strong> All pending orders', detail: 'Manager approved all AI suggestions', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            setTimeout(renderAuditLog, 600);
+        }
+
+        function setMode(mode) {
+            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            const labels = { full: 'Full Auto — Orders under budget execute automatically', semi: 'Semi Auto — AI suggests, you approve', manual: 'Manual — You control everything' };
+            document.querySelector('.hero-content p').textContent = labels[mode];
+        }
+
+        // ===== ANIMATE KPIs =====
+        function animateKPIs() {
+            animateVal('kpi-savings', 0, 2840, '$', '');
+            animateVal('kpi-stock', 0, 87, '', '%');
+            animateVal('kpi-risk', 0, 3, '', '');
+            animateVal('kpi-waste', 0, 4.2, '', '%');
+            animateVal('total-saved', 0, 2840, '$', '');
+        }
+
+        function animateVal(id, from, to, pre, suf) {
+            const el = document.getElementById(id);
+            let cur = from;
+            const step = (to - from) / 50;
+            const iv = setInterval(() => {
+                cur += step;
+                if (cur >= to) { cur = to; clearInterval(iv); }
+                el.textContent = pre + (Number.isInteger(to) ? Math.floor(cur).toLocaleString() : cur.toFixed(1)) + suf;
+            }, 30);
+        }
+
+        // ===== SCROLL REVEAL =====
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+        // ===== CSV UPLOAD / DOWNLOAD =====
+        function downloadCSV(csv, filename) {
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportCurrentStock() {
+            const escape = (v) => {
+                const s = String(v || '').replace(/"/g, '""');
+                return s.includes(',') || s.includes('"') ? `"${s}"` : s;
+            };
+            const headers = 'Product Name,Category,Quantity,Unit,Unit Price ($),Order Date,Expiry Date,Supplier';
+            const rows = products.map(p => {
+                const name = p.name.replace(/^[^\w\s]+/, '').trim(); // Remove leading emojis
+                return `${escape(name)},${escape(p.cat)},${p.stock},${escape(p.unit)},${p.price},${p.orderDate},${p.expiryDate},${escape(p.supplier)}`;
+            });
+            const csv = [headers, ...rows].join('\n');
+            downloadCSV(csv, 'freshmart_current_stock_' + new Date().toISOString().slice(0, 10) + '.csv');
+            auditEntries.unshift({ icon: 'auto', emoji: '📊', text: '<strong>Export:</strong> Current stock exported to CSV', detail: `${products.length} products exported`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            renderAuditLog();
+        }
+
+        function handleCSVFile(file) {
+            if (!file || !file.name.endsWith('.csv')) {
+                document.getElementById('upload-result').innerHTML = '<div style="padding:12px;background:var(--fm-red-dim);border:1px solid rgba(255,107,107,0.2);border-radius:8px;color:var(--fm-red);font-weight:600;">❌ Please select a .csv file</div>';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const lines = e.target.result.split('\n').filter(l => l.trim());
+                if (lines.length < 2) {
+                    document.getElementById('upload-result').innerHTML = '<div style="padding:12px;background:var(--fm-red-dim);border:1px solid rgba(255,107,107,0.2);border-radius:8px;color:var(--fm-red);">❌ CSV file is empty or has no data rows</div>';
+                    return;
+                }
+                const headers = lines[0].split(',').map(h => h.trim());
+                const rows = lines.slice(1).map(l => {
+                    const vals = l.split(',').map(v => v.trim());
+                    const obj = {};
+                    headers.forEach((h, i) => obj[h] = vals[i] || '');
+                    return obj;
+                });
+
+                // Show success
+                document.getElementById('upload-result').innerHTML = `<div style="padding:12px;background:var(--fm-green-dim);border:1px solid rgba(6,214,160,0.2);border-radius:8px;display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--fm-green);font-weight:700;">✅ Loaded ${rows.length} products from ${file.name}</span><button class="btn-approve" onclick="applyUploadedStock()" style="font-size:0.8rem;padding:8px 16px;">🔄 Apply to Dashboard</button></div>`;
+
+                // Preview table
+                const preview = document.getElementById('upload-preview');
+                preview.innerHTML = `<table class="inv-table"><thead><tr>${headers.map(h => '<th>' + h + '</th>').join('')}</tr></thead><tbody>${rows.map(r => '<tr>' + headers.map(h => '<td style="font-size:0.8rem;">' + r[h] + '</td>').join('') + '</tr>').join('')}</tbody></table>`;
+
+                // Store for apply
+                window._uploadedRows = rows;
+
+                auditEntries.unshift({ icon: 'pending', emoji: '📤', text: `<strong>Upload:</strong> ${file.name} (${rows.length} products)`, detail: 'Pending manager review — click Apply to update dashboard', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+                renderAuditLog();
+            };
+            reader.readAsText(file);
+        }
+
+        function applyUploadedStock() {
+            if (!window._uploadedRows) return;
+            const emojis = { dairy: '🥛', bakery: '🍞', fruit: '🍎', vegetable: '🥬', meat: '🍗', seafood: '🐟', drinks: '🥤' };
+            products = window._uploadedRows.map(r => {
+                const cat = (r['Category'] || '').toLowerCase();
+                const qty = parseInt(r['Quantity']) || 0;
+                return {
+                    name: (emojis[cat] || '📦') + ' ' + (r['Product Name'] || 'Unknown'),
+                    stock: qty,
+                    max: Math.max(qty * 2, 50),
+                    shelf: Math.ceil((new Date(r['Expiry Date']) - new Date(r['Order Date'])) / (1000 * 60 * 60 * 24)) || 7,
+                    unit: r['Unit'] || 'units',
+                    price: parseFloat(r['Unit Price ($)']) || 0,
+                    cat: cat || 'other',
+                    orderDate: r['Order Date'] || new Date().toISOString().slice(0, 10),
+                    expiryDate: r['Expiry Date'] || '',
+                    supplier: r['Supplier'] || ''
+                };
+            });
+            renderInventory();
+            renderOrders();
+            document.getElementById('upload-result').innerHTML = '<div style="padding:12px;background:var(--fm-green-dim);border:1px solid rgba(6,214,160,0.2);border-radius:8px;color:var(--fm-green);font-weight:700;">✅ Dashboard updated with uploaded stock! Scroll up to see changes.</div>';
+            document.getElementById('upload-preview').innerHTML = '';
+            auditEntries.unshift({ icon: 'approved', emoji: '🔄', text: '<strong>Applied:</strong> Uploaded stock list is now live', detail: `${products.length} products updated on dashboard`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            renderAuditLog();
+        }
+
+        // ===== LEAF PARTICLES =====
+        function createLeaves() {
+            const container = document.getElementById('leaf-particles');
+            const emojis = ['🍃', '🌿', '🍀', '🌱', '☘️', '🍂'];
+            for (let i = 0; i < 15; i++) {
+                const leaf = document.createElement('span');
+                leaf.className = 'leaf';
+                leaf.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDuration = (12 + Math.random() * 18) + 's';
+                leaf.style.animationDelay = Math.random() * 20 + 's';
+                leaf.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
+                container.appendChild(leaf);
+            }
+        }
+
+        // ===== SETTINGS =====
+        function updateSetting(key, val) {
+            console.log(`Setting updated: ${key} = ${val}`);
+        }
+
+        function saveSettings() {
+            const settings = {
+                budget: document.getElementById('cfg-budget').value,
+                expiryAlert: document.getElementById('cfg-expiry').value,
+                restockThreshold: document.getElementById('cfg-restock').value,
+                mode: document.getElementById('cfg-mode').value,
+                suppliers: document.getElementById('cfg-suppliers').value,
+            };
+            localStorage.setItem('freshmart_settings', JSON.stringify(settings));
+            auditEntries.unshift({ icon: 'approved', emoji: '💾', text: '<strong>Settings Saved</strong>', detail: `Budget: $${settings.budget} | Expiry: ${settings.expiryAlert}d | Restock: ${settings.restockThreshold}% | Mode: ${settings.mode}`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            renderAuditLog();
+            alert('✅ Settings saved successfully!');
+        }
+
+        // ===== INIT =====
+        createLeaves();
+        renderInventory();
+        renderOrders();
+        renderWasteChart();
+        renderAuditLog();
+        animateKPIs();
+    </script>
+</body>
+
+</html>

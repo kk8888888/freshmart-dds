@@ -1,0 +1,16 @@
+Product Name,Category,Quantity,Unit,Unit Price ($),Order Date,Expiry Date,Supplier
+Fresh Milk,Dairy,100,L,4.50,2026-03-01,2026-03-04,DairyFresh Co.
+White Bread,Bakery,60,loaves,2.80,2026-03-01,2026-03-03,Golden Bakery
+Bananas,Fruit,80,kg,3.20,2026-02-28,2026-03-05,TropicFarms
+Eggs (dozen),Dairy,120,dozen,5.50,2026-02-27,2026-03-13,FarmFresh Eggs
+Apples,Fruit,70,kg,4.00,2026-02-28,2026-03-10,OrchardPick
+Cheddar Cheese,Dairy,50,packs,6.50,2026-02-25,2026-03-18,CheeseWorld
+Lettuce,Vegetable,40,heads,2.50,2026-03-01,2026-03-04,GreenLeaf Farm
+Chicken Breast,Meat,60,kg,9.00,2026-03-01,2026-03-03,PoultryPlus
+Orange Juice,Drinks,90,bottles,3.50,2026-02-26,2026-03-08,JuicyCo
+Butter,Dairy,40,packs,4.00,2026-02-20,2026-03-22,DairyFresh Co.
+Yogurt,Dairy,50,cups,2.00,2026-02-28,2026-03-07,DairyFresh Co.
+Tomatoes,Vegetable,35,kg,3.80,2026-03-01,2026-03-06,GreenLeaf Farm
+Salmon Fillet,Seafood,25,kg,15.00,2026-03-01,2026-03-03,OceanCatch
+Whole Wheat Bread,Bakery,30,loaves,3.50,2026-03-01,2026-03-03,Golden Bakery
+Strawberries,Fruit,20,packs,5.00,2026-03-01,2026-03-04,BerryBest
